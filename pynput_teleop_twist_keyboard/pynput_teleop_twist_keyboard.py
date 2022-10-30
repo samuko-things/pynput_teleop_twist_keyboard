@@ -45,7 +45,8 @@ This node takes keypresses from the keyboard
 and publishes them as Twist messages.
 
 ------------------------------------------------
-Moving around with arrow keys:
+NONE CONTINOUS MODE (default mode)
+drive around with arrow keys:
 
  [up/left]     [up]     [up/right]
                 |
@@ -53,18 +54,30 @@ Moving around with arrow keys:
                 |
 [down/left]   [down]   [down/right]
 
+stops when no arrow key is pressed
 
 For Holonomic mode (strafing), 
 hold down the shift key.
 
-stops when no arrow key is pressed
 -------------------------------------------------
+CONTINOUS DRIVE MODE (press caplock to activate
+or deactivate back to non-continous mode)
+drive around with arrow keys only:
 
+              [up]  
+                |
+  [left] ---------------- [right]
+                |
+              [down]  
 
+press key s to stop robot
 
-q/z : increase/decrease max speeds by 10%
-w/x : increase/decrease only linear speed by 10%
-e/c : increase/decrease only angular speed by 10%
+For Holonomic mode (strafing), 
+hold down the shift key.
+
+-------------------------------------------------
+q/z : increase/decrease only linear speed by 10%
+w/x : increase/decrease only angular speed by 10%
 
 ALT to reset speed
 
@@ -79,14 +92,14 @@ class Teleop(Node):
 
 
         self.speedBindings = {
-            'q': (1.1, 1.1),
-            'z': (.9, .9),
-            'w': (1.1, 1),
-            'x': (.9, 1),
-            'e': (1, 1.1),
-            'c': (1, .9),
+            # 'q': (1.1, 1.1),
+            # 'z': (.9, .9),
+            'q': (1.1, 1),
+            'z': (.9, 1),
+            'w': (1, 1.1),
+            'x': (1, .9),
         }
-        self.speed_ctrl_keys = ['q', 'z', 'w', 'x', 'e', 'c']
+        self.speed_ctrl_keys = ['q', 'z', 'w', 'x']
 
         self.default_speed, self.default_turn = process_args_vel()
 
@@ -98,10 +111,12 @@ class Teleop(Node):
         self.th = 0.0
 
         self.holonomic_mode = False
+        self.continuos_mode = False
         self.can_print = True
 
         self.status = 0
-        
+
+        self.Mode = ["non_holonomic","non_continous"]
 
 
         self.send_cmd = self.create_publisher(Twist, 'cmd_vel', 10)
@@ -117,6 +132,7 @@ class Teleop(Node):
         # listener.join()
 
         print(msg)
+        print("mode: ", self.Mode)
             
 
 
@@ -137,6 +153,7 @@ class Teleop(Node):
         if self.can_print:
             if (self.status == 14):
                 print(msg)
+                print("mode: ", self.Mode)
             self.status = (self.status + 1) % 15
 
             print('currently:\tspeed=%s\tturn=%s' % (self.speed, self.turn))
@@ -150,36 +167,86 @@ class Teleop(Node):
 
     def on_press(self, key):       
         if key == Key.up:
-            if self.x == 0:
+            if self.continuos_mode:
                 self.x = 1
+                self.th = 0
+                self.y = 0
+            else:
+                if self.x == 0:
+                    self.x = 1
                 
         elif key == Key.down:
-            if self.x == 0:
+            if self.continuos_mode:
                 self.x = -1
+                self.th = 0
+                self.y = 0
+            else:
+                if self.x == 0:
+                    self.x = -1
 
 
 
         if key == Key.left:
-            if not self.holonomic_mode:
-                if self.th == 0:
+            if self.continuos_mode:
+                if not self.holonomic_mode:
                     self.th = 1
-            else:
-                if self.y == 0:
+                else:
                     self.y = 1
+                self.x = 0
+            else:
+                if not self.holonomic_mode:
+                    if self.th == 0:
+                        self.th = 1
+                else:
+                    if self.y == 0:
+                        self.y = 1
                 
         elif key == Key.right:
-            if not self.holonomic_mode:
-                if self.th == 0:
+            if self.continuos_mode:
+                if not self.holonomic_mode:
                     self.th = -1
-            else:
-                if self.y == 0:
+                else:
                     self.y = -1
+                self.x = 0
+            else:
+                if not self.holonomic_mode:
+                    if self.th == 0:
+                        self.th = -1
+                else:
+                    if self.y == 0:
+                        self.y = -1
 
 
 
         if key == Key.shift:
-            self.holonomic_mode=True
-            self.th = 0
+            if self.holonomic_mode==True:
+                self.holonomic_mode=False
+                self.Mode[0] = "non_holonomic"
+            else:
+                self.holonomic_mode=True
+                self.Mode[0] = "holonomic"
+                self.th = 0
+            
+            print("mode: ", self.Mode)
+            
+        
+        if key == Key.caps_lock:
+            if self.continuos_mode==True:
+                self.continuos_mode = False
+                self.Mode[1] = "non_continuous"
+                self.x = 0.0
+                self.y = 0.0
+                self.z = 0.0
+                self.th = 0.0
+            else:
+                self.continuos_mode = True
+                self.Mode[1] = "continuous"
+                self.x = 0.0
+                self.y = 0.0
+                self.z = 0.0
+                self.th = 0.0
+            
+            print("mode: ", self.Mode)
 
 
         if key == Key.alt:
@@ -187,46 +254,57 @@ class Teleop(Node):
 
         
         if hasattr(key, 'char'):
-            if key .char in self.speed_ctrl_keys:
+            if key.char in self.speed_ctrl_keys:
                 self.speed = self.speed * self.speedBindings[key.char][0]
                 self.turn = self.turn * self.speedBindings[key.char][1]
-
                 self.can_print=True
-        
+
+            elif key.char == 's':
+                self.x = 0.0
+                self.y = 0.0
+                self.z = 0.0
+                self.th = 0.0
 
                     
     def on_release(self, key):
 
         if key == Key.up:
-            if self.x == 1:
-                self.x = 0
+            if self.continuos_mode:
+                pass
+            else:
+                if self.x == 1:
+                    self.x = 0
                 
         elif key == Key.down:
-            if self.x == -1:
-                self.x = 0
+            if self.continuos_mode:
+                pass
+            else:
+                if self.x == -1:
+                    self.x = 0
 
 
 
         if key == Key.left:
-            if not self.holonomic_mode:
-                if self.th == 1:
-                    self.th = 0
+            if self.continuos_mode:
+                pass
             else:
-                if self.y == 1:
-                    self.y = 0
+                if not self.holonomic_mode:
+                    if self.th == 1:
+                        self.th = 0
+                else:
+                    if self.y == 1:
+                        self.y = 0
      
         elif key == Key.right:
-            if not self.holonomic_mode:
-                if self.th == -1:
-                    self.th = 0
+            if self.continuos_mode:
+                pass
             else:
-                if self.y == -1:
-                    self.y = 0
-        
-
-
-        if key == Key.shift:
-            self.holonomic_mode=False
+                if not self.holonomic_mode:
+                    if self.th == -1:
+                        self.th = 0
+                else:
+                    if self.y == -1:
+                        self.y = 0
 
         if key == Key.esc:
             # Stop listener

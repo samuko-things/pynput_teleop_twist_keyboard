@@ -41,7 +41,8 @@ This node takes keypresses from the keyboard
 and publishes them as Twist messages.
 
 ------------------------------------------------
-Moving around with arrow keys:
+NONE CONTINOUS MODE (default mode)
+drive around with arrow keys:
 
  [up/left]     [up]     [up/right]
                 |
@@ -49,17 +50,30 @@ Moving around with arrow keys:
                 |
 [down/left]   [down]   [down/right]
 
+stops when no arrow key is pressed
 
 For Holonomic mode (strafing), 
 hold down the shift key.
 
-stops when no arrow key is pressed
 -------------------------------------------------
+CONTINOUS DRIVE MODE (press caplock to activate
+or deactivate back to non-continous mode)
+drive around with arrow keys only:
 
+              [up]  
+                |
+  [left] ---------------- [right]
+                |
+              [down]  
 
-q/z : increase/decrease max speeds by 10%
-w/x : increase/decrease only linear speed by 10%
-e/c : increase/decrease only angular speed by 10%
+press key s to stop robot
+
+For Holonomic mode (strafing), 
+hold down the shift key.
+
+-------------------------------------------------
+q/z : increase/decrease only linear speed by 10%
+w/x : increase/decrease only angular speed by 10%
 
 ALT to reset speed
 
