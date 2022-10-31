@@ -52,11 +52,11 @@ drive around with arrow keys:
 
 stops when no arrow key is pressed
 
-For Holonomic mode (strafing), 
-hold down the shift key.
+For Holonomic mode (strafing), PRESS ALT key
+(press again to return to non holonomic mode).
 
 -------------------------------------------------
-CONTINOUS DRIVE MODE (press caplock to activate
+CONTINOUS DRIVE MODE (press CAPLOCK to activate
 or deactivate back to non-continous mode)
 drive around with arrow keys only:
 
@@ -66,16 +66,16 @@ drive around with arrow keys only:
                 |
               [down]  
 
-press key s to stop robot
+press s to stop robot
 
-For Holonomic mode (strafing), 
-hold down the shift key.
+For Holonomic mode (strafing), PRESS ALT key
+(press again to return to non holonomic mode).
 
 -------------------------------------------------
 q/z : increase/decrease only linear speed by 10%
 w/x : increase/decrease only angular speed by 10%
 
-ALT to reset speed
+press r to reset speed to the default or input speeds
 
 CTRL-C to quit
 ```

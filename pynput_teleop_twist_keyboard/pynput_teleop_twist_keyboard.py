@@ -19,8 +19,8 @@ enter velocity args in format <linear vel> <angular vel>
         """
 
 def process_args_vel():
-    speed = 0.5
-    turn = 1.0
+    speed = 0.35
+    turn = 0.7
     try:
         if len(sys.argv) == 1:
             print(arg_msg)
@@ -56,11 +56,11 @@ drive around with arrow keys:
 
 stops when no arrow key is pressed
 
-For Holonomic mode (strafing), 
-hold down the shift key.
+For Holonomic mode (strafing), PRESS ALT key
+(press again to return to non holonomic mode).
 
 -------------------------------------------------
-CONTINOUS DRIVE MODE (press caplock to activate
+CONTINOUS DRIVE MODE (press CAPLOCK to activate
 or deactivate back to non-continous mode)
 drive around with arrow keys only:
 
@@ -70,16 +70,16 @@ drive around with arrow keys only:
                 |
               [down]  
 
-press key s to stop robot
+press s to stop robot
 
-For Holonomic mode (strafing), 
-hold down the shift key.
+For Holonomic mode (strafing), PRESS ALT key
+(press again to return to non holonomic mode).
 
 -------------------------------------------------
 q/z : increase/decrease only linear speed by 10%
 w/x : increase/decrease only angular speed by 10%
 
-ALT to reset speed
+press r to reset speed to the default or input speeds
 
 CTRL-C to quit
 """
@@ -92,14 +92,16 @@ class Teleop(Node):
 
 
         self.speedBindings = {
-            # 'q': (1.1, 1.1),
-            # 'z': (.9, .9),
             'q': (1.1, 1),
+            'Q': (1.1, 1),
             'z': (.9, 1),
+            'Z': (.9, 1),
             'w': (1, 1.1),
+            'W': (1, 1.1),
             'x': (1, .9),
+            'X': (1, .9),
         }
-        self.speed_ctrl_keys = ['q', 'z', 'w', 'x']
+        self.speed_ctrl_keys = ['q', 'z', 'w', 'x', 'Q', 'Z', 'W', 'X', 'r', 'R', 's', 'S']
 
         self.default_speed, self.default_turn = process_args_vel()
 
@@ -151,10 +153,10 @@ class Teleop(Node):
 
     def print_speed(self):
         if self.can_print:
-            if (self.status == 14):
+            if (self.status == 10):
                 print(msg)
                 print("mode: ", self.Mode)
-            self.status = (self.status + 1) % 15
+            self.status = (self.status + 1) % 11
 
             print('currently:\tspeed=%s\tturn=%s' % (self.speed, self.turn))
             self.can_print=False
@@ -218,7 +220,7 @@ class Teleop(Node):
 
 
 
-        if key == Key.shift:
+        if key == Key.alt:
             if self.holonomic_mode==True:
                 self.holonomic_mode=False
                 self.Mode[0] = "non_holonomic"
@@ -249,21 +251,24 @@ class Teleop(Node):
             print("mode: ", self.Mode)
 
 
-        if key == Key.alt:
-            self.reset_speed() 
-
         
         if hasattr(key, 'char'):
             if key.char in self.speed_ctrl_keys:
-                self.speed = self.speed * self.speedBindings[key.char][0]
-                self.turn = self.turn * self.speedBindings[key.char][1]
-                self.can_print=True
+                if key.char == 'R' or key.char == 'r':
+                    self.reset_speed()
+                    self.can_print=True
+                elif key.char == 'S' or key.char == 's':
+                    self.x = 0.0
+                    self.y = 0.0
+                    self.z = 0.0
+                    self.th = 0.0
+                else:
+                    self.speed = self.speed * self.speedBindings[key.char][0]
+                    self.turn = self.turn * self.speedBindings[key.char][1]
+                    self.can_print=True
 
-            elif key.char == 's':
-                self.x = 0.0
-                self.y = 0.0
-                self.z = 0.0
-                self.th = 0.0
+            
+
 
                     
     def on_release(self, key):
