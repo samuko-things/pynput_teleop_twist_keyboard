@@ -15,3 +15,11 @@ git push -u origin main
 git remote add origin git@github.com:samuko-things/pynput_teleop_twist_keyboard.git
 git branch -M main
 git push -u origin main
+
+
+#…or push an existing repository from the command line. cool 
+
+git add .
+git commit -m "first commit"
+git branch -M main
+git push -u origin main
