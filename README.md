@@ -23,6 +23,18 @@ or
 $ pip install pynput
 ```
 
+## Build after cloning and sourcing before launch
+```shell
+$ pip3 install setuptools==58.2.0
+```
+run rosdep to initialize:
+```shell
+$ sudo rosdep init
+$ rosdep update
+$ rosdep install -i --from-path src --rosdistro humble -y
+$ colcon build
+```
+
 ## Launch
 to run basically (speed and turn value defaults to 0.5 and 1.0 respectively):
 ```shell
