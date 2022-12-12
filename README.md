@@ -27,7 +27,7 @@ $ pip install pynput
 ```shell
 $ pip3 install setuptools==58.2.0
 ```
-run rosdep initialization:
+run rosdep to initialize:
 ```shell
 $ sudo rosdep init
 $ rosdep update
